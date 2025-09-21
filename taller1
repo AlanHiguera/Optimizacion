@@ -1,0 +1,35 @@
+#Taller 1 D=4
+# 1.- Un artesano fabrica collares y pulseras. Hacer un collar le lleva dos
+#horas y hacer una pulsera una hora. El material de que dispone no le
+#permite hacer más de 50+d piezas. Como mucho el artesano puede
+#dedicar al trabajo 80 horas. Por cada collar gana 5 mil pesos y por cada
+#pulsera 4 mil pesos. 
+# 
+# El artesano desea determinar el número de collares
+#y pulseras que debe fabricar para optimizar sus beneficios.
+
+#Primero modelamos el problema mediante un sistema de inecuaciones.
+
+#sean c el núnmero de collares y p el de pulseras:
+# c + p = 54
+# 2c + p <= 80
+#La función a maximizar es:
+# MAX 500c + 4000p
+
+#lo haremos con linprog de la libreria Scipy
+from scipy.optimize import linprog
+
+A_ub = [[1, 1], [2, 1]]
+B_ub = [54, 80]
+
+fobjetivo = [-5000, -4000] #negativo porque linprog minimiza
+
+c_bounds = (0, None)
+p_bounds = (0, None)
+
+bounds = [c_bounds, p_bounds]
+
+res = (linprog(fobjetivo, A_ub=A_ub, b_ub=B_ub, bounds=bounds, method='highs'))
+
+print('Número de collares y pulseras a fabricar respectivamente:', res.x)
+print('Beneficio máximo:', -res.fun)
