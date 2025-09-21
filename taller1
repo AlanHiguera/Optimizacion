@@ -1,13 +1,14 @@
 #Taller 1 D=4
+
+'''
+Pregunta 1
 # 1.- Un artesano fabrica collares y pulseras. Hacer un collar le lleva dos
 #horas y hacer una pulsera una hora. El material de que dispone no le
 #permite hacer más de 50+d piezas. Como mucho el artesano puede
 #dedicar al trabajo 80 horas. Por cada collar gana 5 mil pesos y por cada
-#pulsera 4 mil pesos. 
-# 
-# El artesano desea determinar el número de collares
+#pulsera 4 mil pesos. El artesano desea determinar el número de collares
 #y pulseras que debe fabricar para optimizar sus beneficios.
-
+'''
 #Primero modelamos el problema mediante un sistema de inecuaciones.
 
 #sean c el núnmero de collares y p el de pulseras:
@@ -19,8 +20,8 @@
 #lo haremos con linprog de la libreria Scipy
 from scipy.optimize import linprog
 
-A_ub = [[1, 1], [2, 1]]
-B_ub = [54, 80]
+A_ub = [[1, 1], [2, 1]]#coeficientes del modelamiento anterior
+B_ub = [54, 80]#lado derecho de las inecuaciones
 
 fobjetivo = [-5000, -4000] #negativo porque linprog minimiza
 
@@ -33,3 +34,59 @@ res = (linprog(fobjetivo, A_ub=A_ub, b_ub=B_ub, bounds=bounds, method='highs'))
 
 print('Número de collares y pulseras a fabricar respectivamente:', res.x)
 print('Beneficio máximo:', -res.fun)
+
+#Respuesta; Número de collares y pulseras a fabricar respectivamente: [26. 28.]
+#Beneficio máximo: 242000.0
+
+
+'''
+Pregunta 2
+2.- Se desea obtener tres elementos químicos a partir de las sustancias
+A y B. Un kilo de A contiene 8 gramos del primer elemento, 1 gramo
+del segundo y 2 del tercero; un kilo de B tiene 4 gramos del primer
+elemento, 1 gramo del segundo y 2 del tercero. Se desea obtener al
+menos 16 gramos del primer elemento y las cantidades del segundo y
+del tercero han de ser como mucho 5+d y 20 gramos, respectivamente;
+y la cantidad de A es como mucho el doble que la de B.
+Calcula los kilos de A y los de B que han de tomarse para que el coste
+sea mínimo si un kilo de A vale 2 euros y uno de B 10 euros.
+'''
+
+#Modelamos el problema:
+
+# 8p + s + 2t = 1 kg de A
+# 4p + s + 2t = 1 kg de B
+
+#p >= 16
+#s <= 54
+#t <= 20
+
+# A aporta 8 gramos de p y B 4 gramos de p y se necesitan al menos 16 entonces:
+# 8A + 4B >= 16 Esta ecuacion habrá que multipluicarla por menos uno en ambos lados porque el programa de libreria considera solo menores o igual.
+#Analogamente para s y t:
+# A + B <= 54
+# 2A + 2B <= 20
+
+#Luego la restriccion final sobre A y B:
+# A <= 2B y eso significa que A - 2B <= 0
+
+#finalmente debemos minimizar lo siguiten:
+# MIN 2A + 10B
+
+#una vez que tenemos todo expresado sobre A y B podemos reemplazar como en la pregunta 1.
+
+A_ub2 = [[-8, -4], [1, 1], [2, 2], [1, -2]]#coeficientes del modelamiento anterior
+B_ub2 = [-16, 54, 20, 0]#lado derecho de las inecuaciones.
+
+A_bounds = (0, None)
+B_bounds = (0, None)
+
+bounds2 = [A_bounds, B_bounds]
+fobjetivo2 = [2, 10]
+
+res2 = (linprog(fobjetivo2, A_ub=A_ub2, b_ub=B_ub2, bounds=bounds2, method='highs'))
+
+print('Kg de A y B para minimizar los costos:', res2.x)
+print('Beneficio máximo:', -res2.fun)
+#eso implica que se generandel primero, del segundo y del tercero respectivamente:
+print('Gramos del primer, segundo y tercer elemento respectivamente:', 8*res2.x[0] + 4*res2.x[1], res2.x[0] + res2.x[1], 2*res2.x[0] + 2*res2.x[1])
