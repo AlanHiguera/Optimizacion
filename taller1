@@ -32,6 +32,7 @@ bounds = [c_bounds, p_bounds]
 
 res = (linprog(fobjetivo, A_ub=A_ub, b_ub=B_ub, bounds=bounds, method='highs'))
 
+print('Respuesta Pregunta 1')
 print('Número de collares y pulseras a fabricar respectivamente:', res.x)
 print('Beneficio máximo:', -res.fun)
 
@@ -86,7 +87,128 @@ fobjetivo2 = [2, 10]
 
 res2 = (linprog(fobjetivo2, A_ub=A_ub2, b_ub=B_ub2, bounds=bounds2, method='highs'))
 
+print('Respuesta Pregunta 2')
 print('Kg de A y B para minimizar los costos:', res2.x)
 print('Beneficio máximo:', -res2.fun)
 #eso implica que se generandel primero, del segundo y del tercero respectivamente:
 print('Gramos del primer, segundo y tercer elemento respectivamente:', 8*res2.x[0] + 4*res2.x[1], res2.x[0] + res2.x[1], 2*res2.x[0] + 2*res2.x[1])
+
+'''
+Pregunta 3
+3.- Enap desea obtener la mezcla de petróleo a partir de crudos de
+distintas procedencias, cada uno de los cuales tienen distintas
+características. 
+En la tabla adjunta se detallan los distintos crudos (4 en
+total) y sus características más importantes: el tanto por ciento de
+azufre, la densidad y el precio por TM en dólares.
+
+Se exige que la mezcla
+tenga unas
+características concretas
+que se traducen en un
+porcentaje del 40% de
+contenido de azufre y
+una densidad igual al
+91%.Se desea que el
+precio de
+la mezcla sea mínimo.
+
+'''
+
+# Se exige 40% de azufre y densidad 91% y que el precio de la mezcla sea mínimo.
+# La idea es encontrar la mejor proporción de cada crudo tal que cumpla las condiciones de la mezcla y que además salga barato.
+# Escribamos las restricciones del sistema dadas las proporciones de los crudos:
+# 0.45C_kuwait + 0.4C_arabia + 0.38C_Noruega + 0.41C_Venezuela = 0.4
+# 0.91C_kuwait + 0.95C_arabia + 0.89C_Noruega + 0.92C_Venezuela = 0.91
+# C_kuwait + C_arabia + C_Noruega + C_Venezuela = 1
+# Queremos minimzar: MIN 35000C_kuwait + 31000C_arabia + 39000C_Noruega + 34000C_Venezuela
+
+A_ub3 = [[0.45, 0.40, 0.38, 0.41], [0.91, 0.95, 0.89, 0.92], [1, 1, 1, 1]]#coeficientes del modelamiento anterior
+B_ub3 = [0.4, 0.91, 1]#lado derecho de las inecuaciones.
+
+C_kuwait_bounds = (0, None)
+C_arabia_bounds = (0, None)
+C_Noruega_bounds = (0, None)
+C_Venezuela_bounds = (0, None)
+
+bounds3 = [C_kuwait_bounds, C_arabia_bounds, C_Noruega_bounds, C_Venezuela_bounds]
+fobjetivo3 = [35000, 31000, 39000, 34000]
+
+res3 = (linprog(fobjetivo3, A_eq=A_ub3, b_eq=B_ub3, bounds=bounds3, method='highs'))
+
+print('Respuesta Pregunta 3')
+print('Proporción de crudos de Kuwait, Arabia, Noruega y Venezuela respectivamente:', res3.x)
+print('Costo mínimo de la mezcla:', res3.fun)
+#Es decir, no se compran los crudos del Kuwait y Arabia sino que se compran aproximadamente un tercio de Noruega y lo demas de Venezuela.
+
+'''
+Pregunta 4
+4.- Confeccione el árbol que se genera el método de Ramificación
+yCorte, en el siguiente PPLE:
+
+Min Z = x1 -2x2
+-4x1 + 6x2 <= 9
+x1 + x2 <= 8
+x1, x2 enteros positivos
+'''
+
+#Empezaremos prescindiedo de la restricción de los enteros positivos y así generaremos la ramificiacion.
+A_ub4 = [[-4, 6], [1, 1]]#coeficientes del modelamiento anterior
+B_ub4 = [9, 8]#lado derecho de las inecuaciones.
+
+x1_bounds = (None, None)
+x2_bounds = (None, None)
+bounds4 = [x1_bounds, x2_bounds]
+fobjetivo4 = [1, -2]
+
+res4 = (linprog(fobjetivo4, A_ub=A_ub4, b_ub=B_ub4, bounds=bounds4, method='highs'))
+print('Primera solucion: ', res4.x)
+# La primera solución nos dice x1 = 3.9 y x2 = 4.1
+# Entonces por cada solución tenemos que generar dos nuevos problemas
+# Dos nuevos probolemas sobre x1: x1 <= 3 y x1 >= 4
+# Dos nuevos problemas sobre x2: x2 <= 4 y x2 >= 5
+# Este procedimiento se repite hasta que todas las soluciones sean enteras.
+
+#Partamos con x1 <= 3
+A_ub5 = [[-4, 6], [1, 1]]#coeficientes del modelamiento anterior
+B_ub5 = [9, 8]#lado derecho de las inecuaciones.
+
+x1_bounds = (None, 3)
+x2_bounds = (None, None)
+bounds5 = [x1_bounds, x2_bounds]
+fobjetivo5 = [1, -2]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion hijo izquierdo de x1 = 3.9: ', res5.x)
+# Se obtuvo x1 = 3 u x2 = 3.5 por lo que se debe ramificar sobre x2.
+# guardamos el x1 = 3
+x1_candidatos = [3]
+
+#ramificamos sobre x2:
+# x2 <= 3
+x1_bounds = (3, 3)
+x2_bounds = (None, 3)
+bounds5 = [x1_bounds, x2_bounds]
+
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion hijo izquierdo de x2 = 3.5: ', res5.x)
+# Se obtuvo x2 = 3. Lo guardamos
+x2_candidatos = [3]
+
+# Ahora ramificamos sobre x2 <= 4
+x1_bounds = (None, None)
+x2_bounds = (None, 4)
+bounds5 = [x1_bounds, x2_bounds]
+
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion hijo izquierdo de x2 = 4.1: ', res5.x)
+# Se obtuvo x1 = 3.75 y x2 = 4. Guardamos el 4.
+x2_candidatos.append(4)
+
+# ramificamos sobre x1 = 3.75. x1 <= 3
+
+x1_bounds = (None, 3)
+x2_bounds = (4, 4)
+bounds5 = [x1_bounds, x2_bounds]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion hijo izquierdo de x1 = 3.75: ', res5.x)
+#
