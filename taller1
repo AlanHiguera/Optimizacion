@@ -9,6 +9,8 @@ Pregunta 1
 #pulsera 4 mil pesos. El artesano desea determinar el número de collares
 #y pulseras que debe fabricar para optimizar sus beneficios.
 '''
+print('Respuesta Pregunta 1')
+print('\n')
 #Primero modelamos el problema mediante un sistema de inecuaciones.
 
 #sean c el núnmero de collares y p el de pulseras:
@@ -32,7 +34,6 @@ bounds = [c_bounds, p_bounds]
 
 res = (linprog(fobjetivo, A_ub=A_ub, b_ub=B_ub, bounds=bounds, method='highs'))
 
-print('Respuesta Pregunta 1')
 print('Número de collares y pulseras a fabricar respectivamente:', res.x)
 print('Beneficio máximo:', -res.fun)
 
@@ -52,7 +53,9 @@ y la cantidad de A es como mucho el doble que la de B.
 Calcula los kilos de A y los de B que han de tomarse para que el coste
 sea mínimo si un kilo de A vale 2 euros y uno de B 10 euros.
 '''
-
+print('\n')
+print('Respuesta Pregunta 2')
+print('\n')
 #Modelamos el problema:
 
 # 8p + s + 2t = 1 kg de A
@@ -87,7 +90,6 @@ fobjetivo2 = [2, 10]
 
 res2 = (linprog(fobjetivo2, A_ub=A_ub2, b_ub=B_ub2, bounds=bounds2, method='highs'))
 
-print('Respuesta Pregunta 2')
 print('Kg de A y B para minimizar los costos:', res2.x)
 print('Beneficio máximo:', -res2.fun)
 #eso implica que se generandel primero, del segundo y del tercero respectivamente:
@@ -114,7 +116,9 @@ precio de
 la mezcla sea mínimo.
 
 '''
-
+print('\n')
+print('Respuesta Pregunta 3')
+print('\n')
 # Se exige 40% de azufre y densidad 91% y que el precio de la mezcla sea mínimo.
 # La idea es encontrar la mejor proporción de cada crudo tal que cumpla las condiciones de la mezcla y que además salga barato.
 # Escribamos las restricciones del sistema dadas las proporciones de los crudos:
@@ -136,7 +140,6 @@ fobjetivo3 = [35000, 31000, 39000, 34000]
 
 res3 = (linprog(fobjetivo3, A_eq=A_ub3, b_eq=B_ub3, bounds=bounds3, method='highs'))
 
-print('Respuesta Pregunta 3')
 print('Proporción de crudos de Kuwait, Arabia, Noruega y Venezuela respectivamente:', res3.x)
 print('Costo mínimo de la mezcla:', res3.fun)
 #Es decir, no se compran los crudos del Kuwait y Arabia sino que se compran aproximadamente un tercio de Noruega y lo demas de Venezuela.
@@ -151,8 +154,10 @@ Min Z = x1 -2x2
 x1 + x2 <= 8
 x1, x2 enteros positivos
 '''
-
-#Empezaremos prescindiedo de la restricción de los enteros positivos y así generaremos la ramificiacion.
+print('\n')
+print('Respuesta Pregunta 4')
+print('\n')
+# Empezaremos prescindiedo de la restricción de los enteros positivos y así generaremos la ramificiacion.
 A_ub4 = [[-4, 6], [1, 1]]#coeficientes del modelamiento anterior
 B_ub4 = [9, 8]#lado derecho de las inecuaciones.
 
@@ -169,7 +174,7 @@ print('Primera solucion: ', res4.x)
 # Dos nuevos problemas sobre x2: x2 <= 4 y x2 >= 5
 # Este procedimiento se repite hasta que todas las soluciones sean enteras.
 
-#Partamos con x1 <= 3
+# Partamos con x1 <= 3
 A_ub5 = [[-4, 6], [1, 1]]#coeficientes del modelamiento anterior
 B_ub5 = [9, 8]#lado derecho de las inecuaciones.
 
@@ -178,19 +183,19 @@ x2_bounds = (None, None)
 bounds5 = [x1_bounds, x2_bounds]
 fobjetivo5 = [1, -2]
 res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
-print('solucion hijo izquierdo de x1 = 3.9: ', res5.x)
+print('solucion x1 <= 3 de x1 = 3.9: ', res5.x)
 # Se obtuvo x1 = 3 u x2 = 3.5 por lo que se debe ramificar sobre x2.
 # guardamos el x1 = 3
 x1_candidatos = [3]
 
-#ramificamos sobre x2:
+# ramificamos sobre x2:
 # x2 <= 3
 x1_bounds = (3, 3)
 x2_bounds = (None, 3)
 bounds5 = [x1_bounds, x2_bounds]
 
 res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
-print('solucion hijo izquierdo de x2 = 3.5: ', res5.x)
+print('solucion x2 <= 3 de x2 = 3.5: ', res5.x)
 # Se obtuvo x2 = 3. Lo guardamos
 x2_candidatos = [3]
 
@@ -200,7 +205,7 @@ x2_bounds = (None, 4)
 bounds5 = [x1_bounds, x2_bounds]
 
 res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
-print('solucion hijo izquierdo de x2 = 4.1: ', res5.x)
+print('solucion x2 <= 4 de x2 = 4.1: ', res5.x)
 # Se obtuvo x1 = 3.75 y x2 = 4. Guardamos el 4.
 x2_candidatos.append(4)
 
@@ -210,5 +215,68 @@ x1_bounds = (None, 3)
 x2_bounds = (4, 4)
 bounds5 = [x1_bounds, x2_bounds]
 res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
-print('solucion hijo izquierdo de x1 = 3.75: ', res5.x)
-#
+print('solucion  x1 <= 3 de x1 = 3.75: ', res5.x)
+#No se obtuvo solución factible.
+
+# ramificamos sobre x1 = 3.75. x1 >= 4
+x1_bounds = (4, None)
+x2_bounds = (4, 4)
+bounds5 = [x1_bounds, x2_bounds]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion x1 >= 4 de x1 = 3.75: ', res5.x)
+# x1 = 4 en este caso. lo guardamos
+x1_candidatos.append(4)
+
+# ramificamos sobre x2 = 3.5. x2 >= 4
+x1_bounds = (3, 3)
+x2_bounds = (4, None)
+bounds5 = [x1_bounds, x2_bounds]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion x2 >= 4 de x2 = 3.5: ', res5.x)
+# No se obtuvo solución factible.
+
+# ramificamos sobre x ?3.0 x1 >= 4
+x1_bounds = (4, None)
+x2_bounds = (None, None)
+bounds5 = [x1_bounds, x2_bounds]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion x1 >= 4 de x1 = 3.9: ', res5.x)
+# Se obtuvo x1 = 4 Y x2 = 4. Ya salieron, no hace falta guardarlas.
+
+#Ramificamos sobre x2 = 4.1, x2 >= 5
+x1_bounds = (None, None)
+x2_bounds = (5, None)
+bounds5 = [x1_bounds, x2_bounds]
+res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+print('solucion x2 >= 5 de x2 = 4.1: ', res5.x)
+# No se obtuvo solución factible.
+
+# Ahora debemos evaluar los candidatos en la función objetivo para ver cual es la mejor solucion.
+# por cada elemento en x1_candidatos verificamos el resultado que da con cada elemento en x2_candidatos
+# verifiquemos los candidatos:
+print('Verificando candidatos:')
+for i in x1_candidatos:
+    print('x1 =', i)
+for j in x2_candidatos:
+    print('x2 =', j)
+for i in x1_candidatos:
+    for j in x2_candidatos:
+        print('Evaluando x1 =', i, 'y x2 =', j)
+        x1_bounds = (i, i)
+        x2_bounds = (j, j)
+        bounds5 = [x1_bounds, x2_bounds]
+        res5 = (linprog(fobjetivo5, A_ub=A_ub5, b_ub=B_ub5, bounds=bounds5, method='highs'))
+        print('Resultado:', res5.fun)
+
+# El mejor resultado que se obtuvo fue con x1 y x2 ambos iguales a 4. Por ende ese es el par que minimiza la función objetivo según 
+# el método de Ramificación y Corte.
+
+'''
+Pregunta 5
+5.- Investigue y aplique el método del gradiente:
+𝑥𝑛+1 = 𝑥𝑛−∝ ∇𝑓(𝑥𝑛), ∀𝑛 ≥ 0, para obtener un mínimo local de la función:
+𝑓(𝑥) = 𝑥2𝑐𝑜𝑠𝑥−𝑥
+10 , con 𝑥0 = 6 y ∝= 0.2 Comente la situación cambiando el
+valor de ∝ por ∝= 0. d .
+'''
+
